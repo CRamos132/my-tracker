@@ -6,6 +6,7 @@ import { collection, getDocs } from "firebase/firestore/lite";
 import { db } from "../lib/firebase";
 import { useEffect } from "react";
 import PageWrapper from "../components/PageWrapper";
+import { useRouter } from "next/router";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,8 +20,12 @@ const geistMono = localFont({
 });
 
 export default function Home() {
+  const router = useRouter()
   const usersCollectionRef = collection(db, "users");
 
+  useEffect(() => {
+    router.push('/dailies')
+  }, [router])
 
   useEffect(() => {
     const getUsers = async () => {
