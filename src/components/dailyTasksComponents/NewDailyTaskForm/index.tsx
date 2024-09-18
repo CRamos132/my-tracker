@@ -1,6 +1,7 @@
-import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, Flex, FormControl, FormLabel, Input, Select } from "@chakra-ui/react";
+import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, Flex, FormControl, FormLabel, Input, Select, useToast } from "@chakra-ui/react";
 import { useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
+import { useTasks } from "../../../contexts/TasksContext";
 
 interface INewDailyTaskForm {
   onClose: () => void
@@ -39,25 +40,55 @@ const weekdays = [
 ]
 
 export default function NewDailyTaskForm({ isOpen, onClose }: INewDailyTaskForm) {
-  const [repeatType, setRepeatType] = useState('daily')
+  const [repeatType, setRepeatType] = useState<"daily" | "weekly" | "monthly">('daily')
   const [repeatDates, setRepeatDates] = useState<string[]>([])
 
+  const toast = useToast()
   const { user } = useAuth()
+  const { createTask } = useTasks()
 
-  const handleForm = (e) => {
+  const handleForm = async (e) => {
     e?.preventDefault()
     console.log("🚀 ~ user:", user)
     const formData = new FormData(e.target)
     const data = Object.fromEntries(formData)
     console.log("🚀 ~ data:", data)
     const newTask = {
-      name: data?.name,
-      description: data?.description,
+      name: data?.name as string,
+      description: data?.description as string,
       repeatType,
       repeatDates: repeatType === 'weekly' ? repeatDates : null,
       createdBy: user?.uid
     }
-    console.log("🚀 ~ newTask:", newTask)
+    if (!newTask.name || !newTask.createdBy || !newTask.repeatType) {
+      toast({
+        title: "Informação faltando.",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      return
+    }
+
+    const task = await createTask(newTask)
+
+    if (task === 'success') {
+      toast({
+        title: "Tarefa criada com sucesso.",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+      onClose()
+      return
+    }
+    toast({
+      title: "Algo deu errado.",
+      description: task,
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
   }
 
   const handleSelectChange = (event) => {
