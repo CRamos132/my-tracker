@@ -5,15 +5,15 @@ import { useRouter } from "next/router";
 
 export default function PageWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, isInit } = useAuth()
 
   useEffect(() => {
     console.log("🚀 ~ user wrapper:", user)
-    if (!user) {
+    if (!user && isInit) {
       router.push('/login')
       return
     }
-  }, [router, user])
+  }, [isInit, router, user])
 
   return (
     <div>

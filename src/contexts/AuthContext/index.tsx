@@ -5,17 +5,20 @@ import { auth, provider } from "../../lib/firebase";
 import { useRouter } from "next/router";
 
 interface IAuthContext {
-  user: Record<string, unknown> | null;
+  user: Record<string, any> | null;
   signInWithGoogle: () => void
+  isInit: boolean
 }
 
 const AuthContext = createContext<IAuthContext>({
   user: null,
-  signInWithGoogle: () => { }
+  signInWithGoogle: () => { },
+  isInit: false
 });
 
 function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<any>(null)
+  const [isInit, setIsInit] = useState(false)
   const router = useRouter()
 
   const signInWithGoogle = () => {
@@ -47,6 +50,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, data => {
       console.log("🚀 ~ user:", data)
+      setIsInit(true)
       if (!data) return
       // data.getIdTokenResult().then((IdTokenResult) => {
       //   if (IdTokenResult?.claims?.admin) {
@@ -62,7 +66,8 @@ function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        signInWithGoogle
+        signInWithGoogle,
+        isInit
       }}
     >
       {children}
