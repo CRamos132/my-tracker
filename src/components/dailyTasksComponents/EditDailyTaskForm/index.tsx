@@ -3,14 +3,14 @@ import { Task } from "../../../contexts/TasksContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDoc, collection } from "firebase/firestore/lite";
 import { db } from "../../../lib/firebase";
-import NewDailyTaskFormContent from "../DailyTaskFormContent";
+import DailyTaskFormContent from "../DailyTaskFormContent";
 
-interface INewDailyTaskForm {
+interface IEditDailyTaskForm {
   onClose: () => void
   isOpen: boolean
 }
 
-export default function NewDailyTaskForm({ isOpen, onClose }: INewDailyTaskForm) {
+export default function EditDailyTaskForm({ isOpen, onClose }: IEditDailyTaskForm) {
 
   const toast = useToast()
   const queryClient = useQueryClient()
@@ -60,7 +60,7 @@ export default function NewDailyTaskForm({ isOpen, onClose }: INewDailyTaskForm)
           Nova tarefa
         </DrawerHeader>
         <DrawerBody>
-          <NewDailyTaskFormContent onSubmit={handleCreateTask} />
+          <DailyTaskFormContent onSubmit={handleCreateTask} />
         </DrawerBody>
       </DrawerContent>
     </Drawer>

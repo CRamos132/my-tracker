@@ -1,5 +1,6 @@
-import { Checkbox, Flex } from "@chakra-ui/react";
+import { Checkbox, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { Task } from "../../../contexts/TasksContext";
+import { FaAngleDown } from "react-icons/fa";
 
 interface IDailyTask {
   task: Task
@@ -25,6 +26,19 @@ export default function DailyTask({ task }: IDailyTask) {
         padding={'8px 12px'}
       >
         {task.name}
+      </Flex>
+      <Flex
+        alignItems={'center'}
+        justifyContent={'center'}
+        marginLeft={'auto'}
+      >
+        <Menu>
+          <MenuButton as={IconButton} icon={<FaAngleDown />} />
+          <MenuList>
+            <MenuItem>Editar</MenuItem>
+            <MenuItem>Deletar</MenuItem>
+          </MenuList>
+        </Menu>
       </Flex>
     </Flex>
   )
