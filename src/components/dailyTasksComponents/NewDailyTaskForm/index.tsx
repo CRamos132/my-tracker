@@ -1,7 +1,10 @@
 import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, Flex, FormControl, FormLabel, Input, Select, useToast } from "@chakra-ui/react";
 import { useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
-import { useTasks } from "../../../contexts/TasksContext";
+import { Task } from "../../../contexts/TasksContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addDoc, collection } from "firebase/firestore/lite";
+import { db } from "../../../lib/firebase";
 
 interface INewDailyTaskForm {
   onClose: () => void
@@ -45,14 +48,48 @@ export default function NewDailyTaskForm({ isOpen, onClose }: INewDailyTaskForm)
 
   const toast = useToast()
   const { user } = useAuth()
-  const { createTask } = useTasks()
+  const queryClient = useQueryClient()
 
-  const handleForm = async (e) => {
+  const createTask = async (task: Task) => {
+    return await addDoc(collection(db, "tasks"), {
+      ...task,
+    })
+      .catch((error) => {
+        return error
+      });
+  }
+
+  const mutation = useMutation({
+    mutationFn: createTask,
+    onSuccess: () => {
+      toast({
+        title: "Tarefa criada com sucesso.",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      onClose()
+    },
+    onError: (error) => {
+      toast({
+        title: "Algo deu errado.",
+        description: error.message,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  })
+
+  const handleCreateTask = (task: Task) => {
+    mutation.mutate(task)
+  }
+
+  const handleForm = (e) => {
     e?.preventDefault()
-    console.log("🚀 ~ user:", user)
     const formData = new FormData(e.target)
     const data = Object.fromEntries(formData)
-    console.log("🚀 ~ data:", data)
     const newTask = {
       name: data?.name as string,
       description: data?.description as string,
@@ -70,25 +107,7 @@ export default function NewDailyTaskForm({ isOpen, onClose }: INewDailyTaskForm)
       return
     }
 
-    const task = await createTask(newTask)
-
-    if (task === 'success') {
-      toast({
-        title: "Tarefa criada com sucesso.",
-        status: "success",
-        duration: 9000,
-        isClosable: true,
-      });
-      onClose()
-      return
-    }
-    toast({
-      title: "Algo deu errado.",
-      description: task,
-      status: "error",
-      duration: 9000,
-      isClosable: true,
-    });
+    handleCreateTask(newTask)
   }
 
   const handleSelectChange = (event) => {
