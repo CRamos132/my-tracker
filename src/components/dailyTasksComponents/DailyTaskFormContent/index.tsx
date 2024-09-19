@@ -36,11 +36,12 @@ const weekdays = [
 
 interface IDailyTaskFormContent {
   onSubmit: (task: Task) => void
+  task?: Task
 }
 
-export default function DailyTaskFormContent({ onSubmit }: IDailyTaskFormContent) {
-  const [repeatType, setRepeatType] = useState<"daily" | "weekly" | "monthly">('daily')
-  const [repeatDates, setRepeatDates] = useState<string[]>([])
+export default function DailyTaskFormContent({ onSubmit, task }: IDailyTaskFormContent) {
+  const [repeatType, setRepeatType] = useState<"daily" | "weekly" | "monthly">(task?.repeatType || 'daily')
+  const [repeatDates, setRepeatDates] = useState<string[]>(task?.repeatDates || [])
 
   const toast = useToast()
   const { user } = useAuth()
@@ -96,15 +97,15 @@ export default function DailyTaskFormContent({ onSubmit }: IDailyTaskFormContent
     >
       <FormControl>
         <FormLabel>Nome da tarefa</FormLabel>
-        <Input name="name" type='text' backgroundColor={'white'} />
+        <Input defaultValue={task?.name} name="name" type='text' backgroundColor={'white'} />
       </FormControl>
       <FormControl>
         <FormLabel>Descrição da tarefa</FormLabel>
-        <Input name="description" type='text' backgroundColor={'white'} />
+        <Input defaultValue={task?.description} name="description" type='text' backgroundColor={'white'} />
       </FormControl>
       <FormControl>
         <FormLabel>Tipo de tarefa</FormLabel>
-        <Select placeholder='Select option' onChange={handleSelectChange} value={repeatType}>
+        <Select placeholder='Select option' onChange={handleSelectChange} value={task?.repeatType || repeatType}>
           <option value='daily'>Diária</option>
           <option value='weekly'>Semanal</option>
           <option value='monthly'>Mensal</option>

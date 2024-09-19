@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
-import DailyTask from "../DailyTask";
 import { useTasks } from "../../../contexts/TasksContext";
+import DailyTaskComponent from "../DailyTaskComponent";
 
 export default function DailyTasksList() {
   const { taskList } = useTasks()
@@ -13,7 +13,7 @@ export default function DailyTasksList() {
       {
         taskList.map(item => {
           return (
-            <DailyTask key={item?.id} task={item} />
+            <DailyTaskComponent key={item?.id} task={item} />
           )
         })
       }

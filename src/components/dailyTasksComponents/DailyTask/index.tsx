@@ -4,9 +4,12 @@ import { FaAngleDown } from "react-icons/fa";
 
 interface IDailyTask {
   task: Task
+  handleEdit: () => void
+  handleDisable: () => void
+  handleDelete: () => void
 }
 
-export default function DailyTask({ task }: IDailyTask) {
+export default function DailyTask({ task, handleEdit, handleDisable, handleDelete }: IDailyTask) {
   return (
     <Flex
       border={'1px solid black'}
@@ -35,8 +38,15 @@ export default function DailyTask({ task }: IDailyTask) {
         <Menu>
           <MenuButton as={IconButton} icon={<FaAngleDown />} />
           <MenuList>
-            <MenuItem>Editar</MenuItem>
-            <MenuItem>Deletar</MenuItem>
+            <MenuItem onClick={handleEdit}>Editar</MenuItem>
+            <MenuItem onClick={handleDisable}>
+              {
+                task?.isDisabled
+                  ? 'Habilitar'
+                  : 'Desabilitar'
+              }
+            </MenuItem>
+            <MenuItem onClick={handleDelete}>Deletar</MenuItem>
           </MenuList>
         </Menu>
       </Flex>

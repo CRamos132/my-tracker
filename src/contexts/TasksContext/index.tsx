@@ -14,6 +14,7 @@ export interface Task {
   description: string
   repeatType: 'daily' | 'weekly' | 'monthly'
   repeatDates?: string[] | null
+  isDisabled?: boolean
   createdBy: string
 }
 
