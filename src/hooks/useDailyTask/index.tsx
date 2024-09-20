@@ -1,9 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { deleteDoc, doc, updateDoc } from "firebase/firestore/lite"
+import { addDoc, arrayUnion, collection, deleteDoc, doc, updateDoc } from "firebase/firestore/lite"
 import { db } from "../../lib/firebase"
 import { Task } from "../../contexts/TasksContext"
 import { useState } from "react"
 import { useDisclosure, useToast } from "@chakra-ui/react"
+import useDates from "../useDates"
+import { useAuth } from "../../contexts/AuthContext"
+import dayjs from "dayjs"
 
 interface IUseDailyTask {
   handleSubmit: (task: Task) => void
@@ -14,11 +17,14 @@ interface IUseDailyTask {
   onDeleteOpen: () => void
   setIsEditOpen: (isOpen: boolean) => void
   onDeleteClose: () => void
+  checkMutation: () => void
 }
 
 export default function useDailyTask(task: Task): IUseDailyTask {
   const [isEditOpen, setIsEditOpen] = useState(false)
 
+  const { datesQuery } = useDates()
+  const { user } = useAuth()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
   const queryClient = useQueryClient()
@@ -83,6 +89,42 @@ export default function useDailyTask(task: Task): IUseDailyTask {
     }
   })
 
+  const handleCheckTask = async () => {
+    const todayDateId = datesQuery?.[0]?.id
+    if (todayDateId) {
+      return await updateDoc(doc(db, "dates", todayDateId as string), {
+        tasksDone: arrayUnion(task.id),
+      })
+    }
+    const startOfDay = dayjs().startOf('day').unix()
+    const newDate = {
+      createdBy: user?.uid,
+      date: startOfDay,
+      tasksDone: [task?.id]
+    }
+    const result = await addDoc(collection(db, "dates"), newDate)
+      .catch((error) => {
+        return error
+      });
+    return result
+  }
+
+  const checkMutation = useMutation({
+    mutationFn: handleCheckTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dates'] })
+    },
+    onError: (error) => {
+      toast({
+        title: "Algo deu errado.",
+        description: error.message,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  })
+
   const handleSubmit = (editedTask: Task) => {
     mutation.mutate(editedTask)
   }
@@ -97,6 +139,12 @@ export default function useDailyTask(task: Task): IUseDailyTask {
   const handleDelete = () => {
     deleteMutation.mutate()
   }
+
+  const handleCheck = () => {
+    console.log("🚀 ~ clicou")
+    checkMutation.mutate()
+  }
+
   return {
     handleSubmit,
     handleDisable,
@@ -105,6 +153,7 @@ export default function useDailyTask(task: Task): IUseDailyTask {
     isDeleteOpen: isOpen,
     onDeleteOpen: onOpen,
     onDeleteClose: onClose,
-    setIsEditOpen
+    setIsEditOpen,
+    checkMutation: handleCheck
   }
 }

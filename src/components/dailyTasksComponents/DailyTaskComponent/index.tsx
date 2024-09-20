@@ -33,7 +33,8 @@ export default function DailyTaskComponent({ task, taskStatus }: IDailyTaskCompo
     isEditOpen,
     onDeleteOpen,
     setIsEditOpen,
-    onDeleteClose
+    onDeleteClose,
+    checkMutation
   } = useDailyTask(task)
 
   return (
@@ -43,6 +44,7 @@ export default function DailyTaskComponent({ task, taskStatus }: IDailyTaskCompo
         handleEdit={() => setIsEditOpen(true)}
         handleDisable={handleDisable}
         handleDelete={onDeleteOpen}
+        handleClickCheck={checkMutation}
         taskStatus={taskStatus}
       />
       <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>

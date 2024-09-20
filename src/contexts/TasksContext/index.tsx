@@ -3,7 +3,7 @@ import { collection, getDocs, query, where } from "firebase/firestore/lite";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import dayjs from "dayjs";
+import useDates from "../../hooks/useDates";
 
 interface ITasksContext {
   taskList: Task[]
@@ -18,13 +18,6 @@ export interface Task {
   repeatDates?: string[] | null
   isDisabled?: boolean
   createdBy: string
-}
-
-export interface Date {
-  id: string
-  createdBy: string
-  date: number
-  tasksDone: string[]
 }
 
 export interface ICategorizedTasksList {
@@ -48,6 +41,7 @@ const TasksContext = createContext<ITasksContext>({
 
 function TasksProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
+  const { datesQuery } = useDates()
 
   const getTasks = useCallback(async () => {
     const q = query(collection(db, "tasks"), where("createdBy", "==", user?.uid))
@@ -62,25 +56,10 @@ function TasksProvider({ children }: { children: ReactNode }) {
 
   const tasksQuery = useQuery({ queryKey: ['tasks'], queryFn: getTasks })
 
-  const getDates = async () => {
-    if (!user?.uid) {
-      return []
-    }
-    const startOfDay = dayjs().startOf('day').unix()
-    const q = query(collection(db, "dates"), where("createdBy", "==", user?.uid), where("date", ">=", startOfDay))
-    const querySnapshot = await getDocs(q);
-    const tasks: Date[] = []
-    querySnapshot.forEach((doc) => {
-      const tasksData = { id: doc.id, ...doc.data() } as Date
-      tasks.push(tasksData)
-    });
-    return tasks
-  }
 
-  const datesQuery = useQuery({ queryKey: ['dates'], queryFn: getDates })
 
   const categorizedTasksList: ICategorizedTasksList = useMemo(() => {
-    const datesData = datesQuery.data ?? []
+    const datesData = datesQuery ?? []
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const tasksDoneInDate = datesData?.reduce((prev: any, curr) => {
       const tasksDone = curr.tasksDone ?? []
@@ -108,7 +87,7 @@ function TasksProvider({ children }: { children: ReactNode }) {
       }
     }, EMPTY_CATEGORIZED_TASK_LIST)
     return separatedList
-  }, [datesQuery.data, tasksQuery.data])
+  }, [datesQuery, tasksQuery.data])
 
   return (
     <TasksContext.Provider

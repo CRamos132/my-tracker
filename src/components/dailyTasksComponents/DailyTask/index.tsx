@@ -8,9 +8,10 @@ interface IDailyTask {
   handleDisable: () => void
   handleDelete: () => void
   taskStatus: TaskStatus
+  handleClickCheck: () => void
 }
 
-export default function DailyTask({ task, handleEdit, handleDisable, handleDelete, taskStatus }: IDailyTask) {
+export default function DailyTask({ task, handleEdit, handleDisable, handleDelete, taskStatus, handleClickCheck }: IDailyTask) {
   const taskColors = {
     disabled: {
       background: 'gray.200',
@@ -37,6 +38,7 @@ export default function DailyTask({ task, handleEdit, handleDisable, handleDelet
       <Flex
         padding={'8px'}
         backgroundColor={taskColors[taskStatus]?.checkbox}
+        onClick={handleClickCheck}
       >
         <Checkbox
           size={'lg'}
