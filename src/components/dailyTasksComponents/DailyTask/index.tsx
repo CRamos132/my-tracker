@@ -10,15 +10,32 @@ interface IDailyTask {
 }
 
 export default function DailyTask({ task, handleEdit, handleDisable, handleDelete }: IDailyTask) {
+  const taskColors = {
+    disabled: {
+      background: 'gray.200',
+      checkbox: 'gray.300',
+      border: 'black'
+    },
+    regular: {
+      background: 'blue.200',
+      checkbox: 'blue.300',
+      border: 'var(--chakra-colors-blue-600)'
+    },
+    checked: {
+      background: 'green.200',
+      checkbox: 'green.300',
+      border: 'var(--chakra-colors-green-600)'
+    },
+  }
   return (
     <Flex
-      border={'1px solid black'}
+      border={`1px solid ${taskColors.checked.border}`}
       direction={'row'}
-      backgroundColor={'gray.200'}
+      backgroundColor={taskColors.checked.background}
     >
       <Flex
         padding={'8px'}
-        backgroundColor={'gray.300'}
+        backgroundColor={taskColors.checked.checkbox}
       >
         <Checkbox
           size={'lg'}
