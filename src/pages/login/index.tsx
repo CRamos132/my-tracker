@@ -7,8 +7,8 @@ export default function LoginPage() {
   const handleForm = (e) => {
     e?.preventDefault()
     const formData = new FormData(e.target)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const data = Object.fromEntries(formData)
-    console.log("🚀 ~ data:", data)
   }
 
   return (

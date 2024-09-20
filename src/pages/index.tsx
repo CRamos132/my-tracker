@@ -2,8 +2,6 @@ import Head from "next/head";
 import Image from "next/image";
 import localFont from "next/font/local";
 import styles from "@/styles/Home.module.css";
-import { collection, getDocs } from "firebase/firestore/lite";
-import { db } from "../lib/firebase";
 import { useEffect } from "react";
 import PageWrapper from "../components/PageWrapper";
 import { useRouter } from "next/router";
@@ -21,20 +19,10 @@ const geistMono = localFont({
 
 export default function Home() {
   const router = useRouter()
-  const usersCollectionRef = collection(db, "users");
 
   useEffect(() => {
     router.push('/dailies')
   }, [router])
-
-  useEffect(() => {
-    const getUsers = async () => {
-      const data = await getDocs(usersCollectionRef);
-
-      console.log("🚀 ~ data.docs.map((doc) => ({ ...doc.data(), id: doc.id })):", data.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
-    };
-    getUsers();
-  }, [usersCollectionRef]);
 
   return (
     <PageWrapper>

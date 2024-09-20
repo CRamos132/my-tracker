@@ -1,5 +1,5 @@
 import { Checkbox, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
-import { Task } from "../../../contexts/TasksContext";
+import { Task, TaskStatus } from "../../../contexts/TasksContext";
 import { FaAngleDown } from "react-icons/fa";
 
 interface IDailyTask {
@@ -7,21 +7,22 @@ interface IDailyTask {
   handleEdit: () => void
   handleDisable: () => void
   handleDelete: () => void
+  taskStatus: TaskStatus
 }
 
-export default function DailyTask({ task, handleEdit, handleDisable, handleDelete }: IDailyTask) {
+export default function DailyTask({ task, handleEdit, handleDisable, handleDelete, taskStatus }: IDailyTask) {
   const taskColors = {
     disabled: {
       background: 'gray.200',
       checkbox: 'gray.300',
       border: 'black'
     },
-    regular: {
+    pending: {
       background: 'blue.200',
       checkbox: 'blue.300',
       border: 'var(--chakra-colors-blue-600)'
     },
-    checked: {
+    done: {
       background: 'green.200',
       checkbox: 'green.300',
       border: 'var(--chakra-colors-green-600)'
@@ -29,13 +30,13 @@ export default function DailyTask({ task, handleEdit, handleDisable, handleDelet
   }
   return (
     <Flex
-      border={`1px solid ${taskColors.checked.border}`}
+      border={`1px solid ${taskColors[taskStatus]?.border}`}
       direction={'row'}
-      backgroundColor={taskColors.checked.background}
+      backgroundColor={taskColors[taskStatus]?.background}
     >
       <Flex
         padding={'8px'}
-        backgroundColor={taskColors.checked.checkbox}
+        backgroundColor={taskColors[taskStatus]?.checkbox}
       >
         <Checkbox
           size={'lg'}

@@ -14,7 +14,6 @@ export default function DailiesPage() {
         justifyContent={'space-between'}
         alignItems={'center'}
         padding={'8px'}
-        marginBottom={'24px'}
       >
         <Box as='h1' fontSize={'32px'} fontWeight={'700'}>
           Tarefas

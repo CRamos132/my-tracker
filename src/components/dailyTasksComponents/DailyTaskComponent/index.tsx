@@ -14,16 +14,17 @@ import {
   ModalHeader,
   ModalOverlay
 } from "@chakra-ui/react";
-import { Task } from "../../../contexts/TasksContext";
+import { Task, TaskStatus } from "../../../contexts/TasksContext";
 import DailyTask from "../DailyTask";
 import DailyTaskFormContent from "../DailyTaskFormContent";
 import useDailyTask from "../../../hooks/useDailyTask";
 
 interface IDailyTaskComponent {
   task: Task
+  taskStatus: TaskStatus
 }
 
-export default function DailyTaskComponent({ task }: IDailyTaskComponent) {
+export default function DailyTaskComponent({ task, taskStatus }: IDailyTaskComponent) {
   const {
     handleDelete,
     handleDisable,
@@ -42,6 +43,7 @@ export default function DailyTaskComponent({ task }: IDailyTaskComponent) {
         handleEdit={() => setIsEditOpen(true)}
         handleDisable={handleDisable}
         handleDelete={onDeleteOpen}
+        taskStatus={taskStatus}
       />
       <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
         <ModalOverlay />

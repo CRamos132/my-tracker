@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from "firebase/auth";
+import { onAuthStateChanged, signInWithPopup } from "firebase/auth";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { auth, provider } from "../../lib/firebase";
 import { useRouter } from "next/router";
@@ -23,21 +23,19 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = () => {
     signInWithPopup(auth, provider)
-      .then((result) => {
+      .then(() => {
         // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
-        console.log("🚀 ~ token:", token)
+        // const credential = GoogleAuthProvider.credentialFromResult(result);
+        // const token = credential?.accessToken;
         // The signed-in user info.
-        const user = result.user;
-        console.log("🚀 ~ user:", user)
+        // const user = result.user;
         router.push('/')
         // IdP data available using getAdditionalUserInfo(result)
         // ...
       }).catch((error) => {
         // Handle Errors here.
         const errorCode = error.code;
-        console.log("🚀 ~ errorCode:", errorCode)
+        console.error("errorCode:", errorCode)
         // const errorMessage = error.message;
         // // The email of the user's account used.
         // const email = error.customData.email;
@@ -49,7 +47,6 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, data => {
-      console.log("🚀 ~ user:", data)
       setIsInit(true)
       if (!data) return
       // data.getIdTokenResult().then((IdTokenResult) => {
