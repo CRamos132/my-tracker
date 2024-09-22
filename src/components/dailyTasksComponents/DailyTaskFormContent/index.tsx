@@ -2,37 +2,7 @@ import { Button, Flex, FormControl, FormLabel, Input, Select, useToast } from "@
 import { useState } from "react"
 import { useAuth } from "../../../contexts/AuthContext"
 import { Task } from "../../../contexts/TasksContext"
-
-const weekdays = [
-  {
-    value: 'sunday',
-    label: 'Domingo'
-  },
-  {
-    value: 'monday',
-    label: 'Segunda'
-  },
-  {
-    value: 'thuesday',
-    label: 'Terça'
-  },
-  {
-    value: 'wednesday',
-    label: 'Quarta'
-  },
-  {
-    value: 'thursday',
-    label: 'Quinta'
-  },
-  {
-    value: 'friday',
-    label: 'Sexta'
-  },
-  {
-    value: 'saturday',
-    label: 'Sábado'
-  }
-]
+import { WEEKDAYS } from "../../../consts/weekdays"
 
 interface IDailyTaskFormContent {
   onSubmit: (task: Task) => void
@@ -115,7 +85,7 @@ export default function DailyTaskFormContent({ onSubmit, task }: IDailyTaskFormC
         repeatType === 'weekly' && (
           <Flex direction={'row'} columnGap={'2px'}>
             {
-              weekdays.map(item => {
+              WEEKDAYS.map(item => {
                 return (
                   <Button
                     key={item.value}

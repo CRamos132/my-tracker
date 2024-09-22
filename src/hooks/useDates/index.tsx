@@ -3,7 +3,6 @@ import { useAuth } from "../../contexts/AuthContext"
 import { collection, getDocs, query, where } from "firebase/firestore/lite"
 import { db } from "../../lib/firebase"
 import { useQuery } from "@tanstack/react-query"
-import { useEffect } from "react"
 
 export interface Date {
   id: string
@@ -48,11 +47,6 @@ export default function useDates() {
   }
 
   const datesQuery = useQuery({ queryKey: ['dates'], queryFn: getDates })
-
-  useEffect(() => {
-
-    console.log("🚀 ~ datesQuery:", datesQuery.data)
-  }, [datesQuery])
 
   return {
     datesQuery: datesQuery.data

@@ -141,7 +141,6 @@ export default function useDailyTask(task: Task): IUseDailyTask {
   }
 
   const handleCheck = () => {
-    console.log("🚀 ~ clicou")
     checkMutation.mutate()
   }
 

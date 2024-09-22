@@ -1,6 +1,7 @@
 import { Checkbox, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { Task, TaskStatus } from "../../../contexts/TasksContext";
 import { FaAngleDown } from "react-icons/fa";
+import Link from "next/link";
 
 interface IDailyTask {
   task: Task
@@ -47,6 +48,9 @@ export default function DailyTask({ task, handleEdit, handleDisable, handleDelet
       <Flex
         fontSize={'24px'}
         padding={'8px 12px'}
+        as={Link}
+        width={'100%'}
+        href={`task/${task.id}`}
       >
         {task.name}
       </Flex>
