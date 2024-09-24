@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { addDoc, arrayUnion, collection, deleteDoc, doc, updateDoc } from "firebase/firestore/lite"
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, updateDoc } from "firebase/firestore/lite"
 import { db } from "../../lib/firebase"
 import { Task } from "../../contexts/TasksContext"
 import { useState } from "react"
@@ -17,7 +17,7 @@ interface IUseDailyTask {
   onDeleteOpen: () => void
   setIsEditOpen: (isOpen: boolean) => void
   onDeleteClose: () => void
-  checkMutation: () => void
+  checkMutation: (isChecked: boolean) => void
 }
 
 export default function useDailyTask(task: Task): IUseDailyTask {
@@ -89,8 +89,13 @@ export default function useDailyTask(task: Task): IUseDailyTask {
     }
   })
 
-  const handleCheckTask = async () => {
+  const handleCheckTask = async (isChecked: boolean) => {
     const todayDateId = datesQuery?.[0]?.id
+    if (isChecked) {
+      return await updateDoc(doc(db, "dates", todayDateId as string), {
+        tasksDone: arrayRemove(task.id),
+      })
+    }
     if (todayDateId) {
       return await updateDoc(doc(db, "dates", todayDateId as string), {
         tasksDone: arrayUnion(task.id),
@@ -140,8 +145,8 @@ export default function useDailyTask(task: Task): IUseDailyTask {
     deleteMutation.mutate()
   }
 
-  const handleCheck = () => {
-    checkMutation.mutate()
+  const handleCheck = (isChecked: boolean) => {
+    checkMutation.mutate(isChecked)
   }
 
   return {

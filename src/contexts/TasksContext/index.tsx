@@ -4,6 +4,8 @@ import { db } from "../../lib/firebase";
 import { useAuth } from "../AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import useDates from "../../hooks/useDates";
+import dayjs from "dayjs";
+import { WEEKDAYS } from "../../consts/weekdays";
 
 interface ITasksContext {
   taskList: Task[]
@@ -41,7 +43,7 @@ const TasksContext = createContext<ITasksContext>({
 
 function TasksProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
-  const { datesQuery } = useDates()
+  const { datesQuery, datesInMonth } = useDates()
 
   const getTasks = useCallback(async () => {
     const q = query(collection(db, "tasks"), where("createdBy", "==", user?.uid))
@@ -56,12 +58,32 @@ function TasksProvider({ children }: { children: ReactNode }) {
 
   const tasksQuery = useQuery({ queryKey: ['tasks'], queryFn: getTasks })
 
-
-
   const categorizedTasksList: ICategorizedTasksList = useMemo(() => {
     const datesData = datesQuery ?? []
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const tasksDoneInDate = datesData?.reduce((prev: any, curr) => {
+      const tasksDone = curr.tasksDone ?? []
+      return [...prev, ...tasksDone]
+    }, [])
+
+    const getDatesInWeek = () => {
+      const startOfWeek = dayjs().startOf('week').unix()
+      const endOfWeek = dayjs().endOf('week').unix()
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const datesInWeek = datesInMonth.reduce((prev: any, curr) => {
+        if (curr.date > endOfWeek || startOfWeek > curr.date) {
+          return prev
+        }
+        return [...prev, curr]
+      }, [])
+      return datesInWeek
+    }
+
+    const datesInWeek = getDatesInWeek()
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tasksDoneInMonth = datesInMonth?.reduce((prev: any, curr) => {
       const tasksDone = curr.tasksDone ?? []
       return [...prev, ...tasksDone]
     }, [])
@@ -75,19 +97,76 @@ function TasksProvider({ children }: { children: ReactNode }) {
           disabled: [...prev.disabled, curr]
         }
       }
+
+      if (curr.repeatType === 'monthly') {
+        if (tasksDoneInMonth.includes(curr.id)) {
+          return {
+            ...prev,
+            done: [...prev.done, curr]
+          }
+        }
+
+        return {
+          ...prev,
+          pending: [...prev.pending, curr]
+        }
+      }
+
+      if (curr.repeatType === 'weekly' && (!curr.repeatDates?.length || curr.repeatDates?.length === 7)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tasksDoneInWeek = datesInWeek?.reduce((prev: any, curr) => {
+          const tasksDone = curr.tasksDone ?? []
+          return [...prev, ...tasksDone]
+        }, [])
+        if (tasksDoneInWeek.includes(curr.id)) {
+          return {
+            ...prev,
+            done: [...prev.done, curr]
+          }
+        }
+
+        return {
+          ...prev,
+          pending: [...prev.pending, curr]
+        }
+      }
+
+      if (curr.repeatType === 'weekly') {
+        const currentWeekdayKey = dayjs().day()
+        const currentWeekday = WEEKDAYS[currentWeekdayKey]
+        const taskWeekdays = curr.repeatDates
+
+        if (!taskWeekdays?.includes(currentWeekday.value)) {
+          return prev
+        }
+
+        if (tasksDoneInDate.includes(curr.id)) {
+          return {
+            ...prev,
+            done: [...prev.done, curr]
+          }
+        }
+
+        return {
+          ...prev,
+          pending: [...prev.pending, curr]
+        }
+      }
+
       if (tasksDoneInDate.includes(curr.id)) {
         return {
           ...prev,
           done: [...prev.done, curr]
         }
       }
+
       return {
         ...prev,
         pending: [...prev.pending, curr]
       }
     }, EMPTY_CATEGORIZED_TASK_LIST)
     return separatedList
-  }, [datesQuery, tasksQuery.data])
+  }, [datesInMonth, datesQuery, tasksQuery.data])
 
   return (
     <TasksContext.Provider

@@ -1,4 +1,4 @@
-import { Checkbox, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
+import { Checkbox, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { Task, TaskStatus } from "../../../contexts/TasksContext";
 import { FaAngleDown } from "react-icons/fa";
 import Link from "next/link";
@@ -9,7 +9,7 @@ interface IDailyTask {
   handleDisable: () => void
   handleDelete: () => void
   taskStatus: TaskStatus
-  handleClickCheck: () => void
+  handleClickCheck: (isChecked: boolean) => void
 }
 
 export default function DailyTask({ task, handleEdit, handleDisable, handleDelete, taskStatus, handleClickCheck }: IDailyTask) {
@@ -30,6 +30,14 @@ export default function DailyTask({ task, handleEdit, handleDisable, handleDelet
       border: 'var(--chakra-colors-green-600)'
     },
   }
+
+  const handleClick = () => {
+    if (taskStatus === 'disabled') {
+      return
+    }
+    handleClickCheck(Boolean(taskStatus === 'done'))
+  }
+
   return (
     <Flex
       border={`1px solid ${taskColors[taskStatus]?.border}`}
@@ -39,7 +47,10 @@ export default function DailyTask({ task, handleEdit, handleDisable, handleDelet
       <Flex
         padding={'8px'}
         backgroundColor={taskColors[taskStatus]?.checkbox}
-        onClick={handleClickCheck}
+        onClick={handleClick}
+        alignItems={'flex-start'}
+        paddingTop={'16px'}
+        cursor={taskStatus === 'disabled' ? 'not-allowed' : 'inherit'}
       >
         <Checkbox
           size={'lg'}
@@ -51,8 +62,16 @@ export default function DailyTask({ task, handleEdit, handleDisable, handleDelet
         as={Link}
         width={'100%'}
         href={`task/${task.id}`}
+        direction={'column'}
       >
         {task.name}
+        {
+          task.description && (
+            <Text fontSize={'16px'}>
+              {task.description}
+            </Text>
+          )
+        }
       </Flex>
       <Flex
         alignItems={'center'}
