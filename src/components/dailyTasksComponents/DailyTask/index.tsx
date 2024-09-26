@@ -41,6 +41,7 @@ export default function DailyTask({ task, handleEdit, handleDisable, handleDelet
   return (
     <Flex
       border={`1px solid ${taskColors[taskStatus]?.border}`}
+      borderRadius={'4px'}
       direction={'row'}
       backgroundColor={taskColors[taskStatus]?.background}
     >
@@ -79,7 +80,7 @@ export default function DailyTask({ task, handleEdit, handleDisable, handleDelet
         marginLeft={'auto'}
       >
         <Menu>
-          <MenuButton as={IconButton} icon={<FaAngleDown />} />
+          <MenuButton backgroundColor={'transparent'} as={IconButton} icon={<FaAngleDown />} />
           <MenuList>
             <MenuItem onClick={handleEdit}>Editar</MenuItem>
             <MenuItem onClick={handleDisable}>

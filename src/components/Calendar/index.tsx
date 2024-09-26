@@ -9,7 +9,14 @@ interface ICalendarHeader {
 
 function CalendarHeader({ weekday }: ICalendarHeader) {
   return (
-    <GridItem w='100%' h='25px' bg='blue.500' textAlign={'center'}>
+    <GridItem
+      w='100%'
+      h='25px'
+      borderRadius={'4px'}
+      bg='gray.100'
+      textAlign={'center'}
+      border={'1px solid var(--chakra-colors-gray-500)'}
+    >
       {weekday.substring(0, 3)}
     </GridItem>
   )
@@ -66,9 +73,19 @@ export default function Calendar({ filledDates }: ICalendar) {
     return filledDates.map(item => dayjs(item * 1000).format('MM/DD/YYYY'))
   }, [filledDates])
 
+  const today = dayjs().startOf('day').format('MM/DD/YYYY')
+
   return (
     <Flex direction={'column'} padding={'16px'}>
-      <Flex h='25px' bg='blue.500' alignItems={'center'} justifyContent={'center'} marginBottom={'8px'}>
+      <Flex
+        h='25px'
+        borderRadius={'4px'}
+        bg='gray.100'
+        alignItems={'center'}
+        justifyContent={'center'}
+        marginBottom={'8px'}
+        border={'1px solid var(--chakra-colors-gray-500)'}
+      >
         {dayjs().format('MMMM')}
       </Flex>
       <Grid templateColumns='repeat(7, 1fr)' gap='8px' marginBottom={'8px'}>
@@ -84,8 +101,18 @@ export default function Calendar({ filledDates }: ICalendar) {
         {
           monthDays.map((item, index) => {
             const isDayDone = formattedFilledDates.includes(item?.date)
+            const isDateToday = today === item.date
+
             return (
-              <GridItem w='100%' h='50px' bg={isDayDone ? 'green.500' : 'blue.500'} textAlign={'center'} key={index}>
+              <GridItem
+                w='100%'
+                h='50px'
+                borderRadius={'4px'}
+                bg={isDayDone ? 'green.300' : 'gray.100'}
+                textAlign={'center'}
+                border={`${isDateToday ? '2px' : '1px'} solid ${isDateToday ? 'var(--chakra-colors-blue-500)' : 'var(--chakra-colors-gray-500)'}`}
+                key={index}
+              >
                 {item.label}
               </GridItem>
             )
