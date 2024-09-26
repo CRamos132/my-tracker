@@ -9,6 +9,7 @@ export interface Date {
   createdBy: string
   date: number
   tasksDone: string[]
+  moodsChecked?: string[]
 }
 
 export default function useDates() {

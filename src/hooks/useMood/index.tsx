@@ -1,16 +1,15 @@
+import { useState } from "react"
+import { Mood } from "../../contexts/MoodsContext"
+import useDates from "../useDates"
+import { useAuth } from "../../contexts/AuthContext"
+import { useDisclosure, useToast } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, updateDoc } from "firebase/firestore/lite"
 import { db } from "../../lib/firebase"
-import { Task } from "../../contexts/TasksContext"
-import { useState } from "react"
-import { useDisclosure, useToast } from "@chakra-ui/react"
-import useDates from "../useDates"
-import { useAuth } from "../../contexts/AuthContext"
 import dayjs from "dayjs"
 
-interface IUseDailyTask {
-  handleSubmit: (task: Task) => void
-  handleDisable: () => void
+interface IUseMood {
+  handleSubmit: (mood: Mood) => void
   handleDelete: () => void
   isEditOpen: boolean
   isDeleteOpen: boolean
@@ -20,7 +19,7 @@ interface IUseDailyTask {
   checkMutation: (isChecked: boolean) => void
 }
 
-export default function useDailyTask(task: Task): IUseDailyTask {
+export default function useMood(mood: Mood): IUseMood {
   const [isEditOpen, setIsEditOpen] = useState(false)
 
   const { datesQuery } = useDates()
@@ -29,9 +28,9 @@ export default function useDailyTask(task: Task): IUseDailyTask {
   const toast = useToast()
   const queryClient = useQueryClient()
 
-  const editTask = async (editedTask: Task) => {
-    return await updateDoc(doc(db, "tasks", task.id as string), {
-      ...editedTask,
+  const editTask = async (editedMood: Mood) => {
+    return await updateDoc(doc(db, "moods", mood.id as string), {
+      ...editedMood,
     })
       .catch((error) => {
         return error
@@ -39,7 +38,7 @@ export default function useDailyTask(task: Task): IUseDailyTask {
   }
 
   const deleteTask = async () => {
-    return await deleteDoc(doc(db, "tasks", task.id as string))
+    return await deleteDoc(doc(db, "moods", mood.id as string))
       .catch(error => error)
   }
 
@@ -47,12 +46,12 @@ export default function useDailyTask(task: Task): IUseDailyTask {
     mutationFn: editTask,
     onSuccess: () => {
       toast({
-        title: "Tarefa editada com sucesso.",
+        title: "Mood editado com sucesso.",
         status: "success",
         duration: 9000,
         isClosable: true,
       });
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['moods'] })
       setIsEditOpen(false)
     },
     onError: (error) => {
@@ -70,12 +69,12 @@ export default function useDailyTask(task: Task): IUseDailyTask {
     mutationFn: deleteTask,
     onSuccess: () => {
       toast({
-        title: "Tarefa deletada com sucesso.",
+        title: "Mood deletado com sucesso.",
         status: "success",
         duration: 9000,
         isClosable: true,
       });
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['moods'] })
       onClose()
     },
     onError: (error) => {
@@ -90,23 +89,24 @@ export default function useDailyTask(task: Task): IUseDailyTask {
   })
 
   const handleCheckTask = async (isChecked: boolean) => {
-    const todayDateId = datesQuery?.[0]?.id
+    const todayDate = datesQuery?.[0]
+    const todayDateId = todayDate?.id
     if (isChecked) {
       return await updateDoc(doc(db, "dates", todayDateId as string), {
-        tasksDone: arrayRemove(task.id),
+        moodsChecked: arrayRemove(mood.id),
       })
     }
     if (todayDateId) {
       return await updateDoc(doc(db, "dates", todayDateId as string), {
-        tasksDone: arrayUnion(task.id),
+        moodsChecked: arrayUnion(mood.id),
       })
     }
     const startOfDay = dayjs().startOf('day').unix()
     const newDate = {
       createdBy: user?.uid,
       date: startOfDay,
-      tasksDone: [task?.id],
-      moodsChecked: [],
+      tasksDone: [],
+      moodsChecked: [mood?.id],
     }
     const result = await addDoc(collection(db, "dates"), newDate)
       .catch((error) => {
@@ -131,15 +131,8 @@ export default function useDailyTask(task: Task): IUseDailyTask {
     }
   })
 
-  const handleSubmit = (editedTask: Task) => {
+  const handleSubmit = (editedTask: Mood) => {
     mutation.mutate(editedTask)
-  }
-
-  const handleDisable = () => {
-    mutation.mutate({
-      ...task,
-      isDisabled: !task?.isDisabled
-    })
   }
 
   const handleDelete = () => {
@@ -152,7 +145,6 @@ export default function useDailyTask(task: Task): IUseDailyTask {
 
   return {
     handleSubmit,
-    handleDisable,
     handleDelete,
     isEditOpen,
     isDeleteOpen: isOpen,

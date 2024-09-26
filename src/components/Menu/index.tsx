@@ -13,13 +13,13 @@ export default function Menu() {
       alignItems={'center'}
       justifyContent={'space-around'}
     >
-      <MenuLink href="/mood">
+      <MenuLink href="/moods">
         Mood
       </MenuLink>
       <MenuLink href="/dailies">
         Diárias
       </MenuLink>
-      <MenuLink href="/todo">
+      <MenuLink href="/todos">
         To do
       </MenuLink>
     </Flex>
