@@ -15,7 +15,6 @@ export default function NewMoodForm({ isOpen, onClose }: INewMoodForm) {
   const queryClient = useQueryClient()
 
   const createMood = async (mood: Mood) => {
-    console.log("🚀 ~ mood:", mood)
     return await addDoc(collection(db, "moods"), {
       ...mood,
     })

@@ -1,10 +1,25 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import MoodComponent from "../MoodComponent";
 import { useMoods } from "../../../contexts/MoodsContext";
+import { IoSearchOutline } from "react-icons/io5";
+import { useMemo, useState } from "react";
 
 export default function MoodsList() {
+  const [searchText, setSearchText] = useState('')
+
   const { moodsList } = useMoods()
-  console.log("🚀 ~ moodsList:", moodsList)
+
+  const handleChange = (event) => setSearchText(event.target.value)
+
+  const filteredSearchText = useMemo(() => {
+    if (!searchText.length) {
+      return moodsList
+    }
+    return [...moodsList].filter(item => {
+      return item.name.toLowerCase().includes(searchText.toLowerCase())
+    })
+  }, [moodsList, searchText])
+
   return (
     <Flex
       direction={'column'}
@@ -12,8 +27,14 @@ export default function MoodsList() {
       rowGap={'24px'}
       padding={'16px'}
     >
+      <InputGroup>
+        <InputLeftElement pointerEvents='none'>
+          <IoSearchOutline color='gray.300' />
+        </InputLeftElement>
+        <Input placeholder="Busque moods" onChange={handleChange} />
+      </InputGroup>
       {
-        moodsList.map(item => {
+        filteredSearchText.map(item => {
           return (
             <MoodComponent mood={item} key={item.id} />
           )
