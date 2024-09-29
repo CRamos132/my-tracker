@@ -12,7 +12,7 @@ export interface Date {
   moodsChecked?: string[]
 }
 
-export default function useDates() {
+export default function useDates(baseDate?: number) {
   const { user } = useAuth()
 
   const getDatesInMonth = async () => {
@@ -31,13 +31,13 @@ export default function useDates() {
     return tasks
   }
 
-  const datesInMonth = useQuery({ queryKey: ['datesInMonth'], queryFn: getDatesInMonth })
+  const datesInMonth = useQuery({ queryKey: ['datesInMonth'], queryFn: getDatesInMonth, enabled: Boolean(user?.uid) })
 
   const getDates = async () => {
     if (!user?.uid) {
       return []
     }
-    const startOfDay = dayjs().startOf('day').unix()
+    const startOfDay = dayjs(baseDate).startOf('day').unix()
     const q = query(collection(db, "dates"), where("createdBy", "==", user?.uid), where("date", "==", startOfDay))
     const querySnapshot = await getDocs(q);
     const tasks: Date[] = []
@@ -48,7 +48,7 @@ export default function useDates() {
     return tasks
   }
 
-  const datesQuery = useQuery({ queryKey: ['dates'], queryFn: getDates })
+  const datesQuery = useQuery({ queryKey: ['dates'], queryFn: getDates, enabled: Boolean(user?.uid) })
 
   return {
     datesQuery: datesQuery.data,

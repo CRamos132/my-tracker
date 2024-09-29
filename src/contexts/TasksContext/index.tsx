@@ -56,7 +56,7 @@ function TasksProvider({ children }: { children: ReactNode }) {
     return tasks
   }, [user?.uid])
 
-  const tasksQuery = useQuery({ queryKey: ['tasks'], queryFn: getTasks })
+  const tasksQuery = useQuery({ queryKey: ['tasks'], queryFn: getTasks, enabled: Boolean(user?.uid) })
 
   const categorizedTasksList: ICategorizedTasksList = useMemo(() => {
     const datesData = datesQuery ?? []

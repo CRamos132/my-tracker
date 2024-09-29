@@ -33,7 +33,7 @@ export default function DailyTaskPage() {
     return tasks
   }
 
-  const datesQuery = useQuery({ queryKey: ['monthDates'], queryFn: getDates })
+  const datesQuery = useQuery({ queryKey: ['monthDates'], queryFn: getDates, enabled: Boolean(user?.uid) })
 
   const filledDates = useMemo(() => {
     const currentTaskId = router.query.id
@@ -64,7 +64,7 @@ export default function DailyTaskPage() {
   const getTaskQuery = useQuery({
     queryKey: [`task${router.query.id}`],
     queryFn: getTaskById,
-    enabled: Boolean(router.query.id)
+    enabled: Boolean(router.query.id) && Boolean(user?.uid)
   })
 
   const taskData = getTaskQuery.data
@@ -107,7 +107,7 @@ export default function DailyTaskPage() {
           {taskData?.name}
         </Text>
       </Flex>
-      <Calendar filledDates={filledDates} />
+      <Calendar filledDates={filledDates} entityType="tasks" />
     </PageWrapper>
   )
 }

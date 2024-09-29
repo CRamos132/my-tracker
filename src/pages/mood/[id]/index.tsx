@@ -33,7 +33,7 @@ export default function DailyMoodPage() {
     return dates
   }
 
-  const datesQuery = useQuery({ queryKey: ['monthDates'], queryFn: getDates })
+  const datesQuery = useQuery({ queryKey: ['monthDates'], queryFn: getDates, enabled: Boolean(user?.uid) })
 
   const filledDates = useMemo(() => {
     const currentMoodId = router.query.id
@@ -65,7 +65,7 @@ export default function DailyMoodPage() {
   const getMoodQuery = useQuery({
     queryKey: [`mood${router.query.id}`],
     queryFn: getMoodById,
-    enabled: Boolean(router.query.id)
+    enabled: Boolean(router.query.id) && Boolean(user?.uid)
   })
 
   const moodData = getMoodQuery.data
@@ -108,7 +108,7 @@ export default function DailyMoodPage() {
           {moodData?.name}
         </Text>
       </Flex>
-      <Calendar filledDates={filledDates} />
+      <Calendar filledDates={filledDates} entityType="moods" />
     </PageWrapper>
   )
 }

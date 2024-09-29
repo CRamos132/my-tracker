@@ -2,6 +2,8 @@ import { Flex, Grid, GridItem } from "@chakra-ui/react";
 import { WEEKDAYS } from "../../consts/weekdays";
 import { useMemo } from "react";
 import dayjs from "dayjs";
+import Link from "next/link";
+import { Entities } from "../../types/entities";
 
 interface ICalendarHeader {
   weekday: string
@@ -24,9 +26,11 @@ function CalendarHeader({ weekday }: ICalendarHeader) {
 
 interface ICalendar {
   filledDates: number[]
+  entityType: Entities
 }
 
-export default function Calendar({ filledDates }: ICalendar) {
+export default function Calendar({ filledDates, entityType }: ICalendar) {
+
   const monthDays = useMemo(() => {
     const daysInMonth = dayjs().daysInMonth()
     const startOfMonth = dayjs().startOf('month')
@@ -39,7 +43,8 @@ export default function Calendar({ filledDates }: ICalendar) {
           {
             date: startOfMonth.format('MM/DD/YYYY'),
             weekday: dayjs(startOfMonth).day(),
-            label: dayjs(startOfMonth).format('DD')
+            label: dayjs(startOfMonth).format('DD'),
+            rawDate: dayjs(startOfMonth).unix()
           }
         ]
       }
@@ -52,7 +57,8 @@ export default function Calendar({ filledDates }: ICalendar) {
         {
           date: currentDate.format('MM/DD/YYYY'),
           weekday: dayjs(currentDate).day(),
-          label: dayjs(currentDate).format('DD')
+          label: dayjs(currentDate).format('DD'),
+          rawDate: dayjs(currentDate).unix()
         }
       ]
     }, [])
@@ -112,6 +118,8 @@ export default function Calendar({ filledDates }: ICalendar) {
                 textAlign={'center'}
                 border={`${isDateToday ? '2px' : '1px'} solid ${isDateToday ? 'var(--chakra-colors-blue-500)' : 'var(--chakra-colors-gray-500)'}`}
                 key={index}
+                as={Link}
+                href={`/calendar/${encodeURIComponent(item.rawDate)}/${entityType}`}
               >
                 {item.label}
               </GridItem>

@@ -35,7 +35,7 @@ function MoodsProvider({ children }: { children: ReactNode }) {
     return moods
   }, [user?.uid])
 
-  const moodsQuery = useQuery({ queryKey: ['moods'], queryFn: getMoods })
+  const moodsQuery = useQuery({ queryKey: ['moods'], queryFn: getMoods, enabled: Boolean(user?.uid) })
 
   const moodsList = useMemo(() => {
     const moodsData = moodsQuery.data ?? []
