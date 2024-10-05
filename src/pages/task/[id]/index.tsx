@@ -6,13 +6,15 @@ import { collection, doc, getDoc, getDocs, query, where } from "firebase/firesto
 import { db } from "../../../lib/firebase";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Date } from "../../../hooks/useDates";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { Flex, IconButton, Text } from "@chakra-ui/react";
 import { Task } from "../../../contexts/TasksContext";
 import { RiArrowLeftSLine } from "react-icons/ri";
 
 export default function DailyTaskPage() {
+  const [currentMonthState, setCurrentMonthState] = useState<null | string>(null)
+
   const router = useRouter()
   const { user } = useAuth()
   const queryClient = useQueryClient()
@@ -21,8 +23,9 @@ export default function DailyTaskPage() {
     if (!user?.uid) {
       return []
     }
-    const startOfMonth = dayjs().startOf('month').unix()
-    const endOfMonth = dayjs().endOf('month').unix()
+    const currentMonth = currentMonthState ?? dayjs()
+    const startOfMonth = dayjs(currentMonth).startOf('month').unix()
+    const endOfMonth = dayjs(currentMonth).endOf('month').unix()
     const q = query(collection(db, "dates"), where("createdBy", "==", user?.uid), where("date", ">=", startOfMonth), where("date", "<=", endOfMonth))
     const querySnapshot = await getDocs(q);
     const tasks: Date[] = []
@@ -33,7 +36,7 @@ export default function DailyTaskPage() {
     return tasks
   }
 
-  const datesQuery = useQuery({ queryKey: ['monthDates'], queryFn: getDates, enabled: Boolean(user?.uid) })
+  const datesQuery = useQuery({ queryKey: ['monthDates', currentMonthState], queryFn: getDates, enabled: Boolean(user?.uid) })
 
   const filledDates = useMemo(() => {
     const currentTaskId = router.query.id
@@ -49,7 +52,7 @@ export default function DailyTaskPage() {
       return [...prev]
     }, [])
     return datesWithTask
-  }, [datesQuery.data, router.query.id])
+  }, [datesQuery, router.query.id])
 
   const getTaskById = async () => {
     const taskId = router.query.id ?? ''
@@ -71,6 +74,19 @@ export default function DailyTaskPage() {
 
   const goBack = () => {
     router.back()
+  }
+
+  const setCurrentMonth = (operation: 'add' | 'subtract') => {
+    const currentState = currentMonthState ?? dayjs()
+    const month = dayjs(currentState)
+    if (operation === 'add') {
+      const updatedMonth = dayjs(month).add(1, 'month').format('MMM YYYY')
+      setCurrentMonthState(updatedMonth)
+      return
+    }
+    const updatedMonth = dayjs(month).subtract(1, 'month').format('MMM YYYY')
+    setCurrentMonthState(updatedMonth)
+    return
   }
 
   useEffect(() => {
@@ -107,7 +123,7 @@ export default function DailyTaskPage() {
           {taskData?.name}
         </Text>
       </Flex>
-      <Calendar filledDates={filledDates} entityType="tasks" />
+      <Calendar filledDates={filledDates} entityType="tasks" setCurrentMonth={setCurrentMonth} month={currentMonthState} />
     </PageWrapper>
   )
 }

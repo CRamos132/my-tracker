@@ -1,4 +1,4 @@
-import { Flex, Grid, GridItem } from "@chakra-ui/react";
+import { Button, Flex, Grid, GridItem } from "@chakra-ui/react";
 import { WEEKDAYS } from "../../consts/weekdays";
 import { useMemo } from "react";
 import dayjs from "dayjs";
@@ -27,13 +27,16 @@ function CalendarHeader({ weekday }: ICalendarHeader) {
 interface ICalendar {
   filledDates: number[]
   entityType: Entities
+  month?: string | null
+  setCurrentMonth?: (operation: 'add' | 'subtract') => void
 }
 
-export default function Calendar({ filledDates, entityType }: ICalendar) {
+export default function Calendar({ filledDates, entityType, month, setCurrentMonth }: ICalendar) {
+  const currentMonth = month ?? dayjs()
 
   const monthDays = useMemo(() => {
-    const daysInMonth = dayjs().daysInMonth()
-    const startOfMonth = dayjs().startOf('month')
+    const daysInMonth = dayjs(currentMonth).daysInMonth()
+    const startOfMonth = dayjs(currentMonth).startOf('month')
     const datesArray = Array(daysInMonth).fill(null)
 
     const monthDates = datesArray.reduce((prev) => {
@@ -73,7 +76,7 @@ export default function Calendar({ filledDates, entityType }: ICalendar) {
     })
 
     return [...emptyDays, ...monthDates]
-  }, [])
+  }, [currentMonth])
 
   const formattedFilledDates = useMemo(() => {
     return filledDates.map(item => dayjs(item * 1000).format('MM/DD/YYYY'))
@@ -84,15 +87,50 @@ export default function Calendar({ filledDates, entityType }: ICalendar) {
   return (
     <Flex direction={'column'} padding={'16px'}>
       <Flex
-        h='25px'
-        borderRadius={'4px'}
-        bg='gray.100'
+        direction={'row'}
         alignItems={'center'}
-        justifyContent={'center'}
+        gap={'8px'}
         marginBottom={'8px'}
-        border={'1px solid var(--chakra-colors-gray-500)'}
       >
-        {dayjs().format('MMMM')}
+        {
+          Boolean(setCurrentMonth) && (
+            <Button
+              onClick={() => setCurrentMonth?.('subtract')}
+              h='25px'
+              w='25px'
+              bg='gray.100'
+              variant={'outline'}
+              border={'1px solid var(--chakra-colors-gray-500)'}
+            >
+              {'<'}
+            </Button>
+          )
+        }
+        <Flex
+          h='25px'
+          borderRadius={'4px'}
+          bg='gray.100'
+          alignItems={'center'}
+          justifyContent={'center'}
+          width={'100%'}
+          border={'1px solid var(--chakra-colors-gray-500)'}
+        >
+          {dayjs(currentMonth).format('MMMM')}
+        </Flex>
+        {
+          Boolean(setCurrentMonth) && (
+            <Button
+              onClick={() => setCurrentMonth?.('add')}
+              h='25px'
+              w='25px'
+              bg='gray.100'
+              variant={'outline'}
+              border={'1px solid var(--chakra-colors-gray-500)'}
+            >
+              {'>'}
+            </Button>
+          )
+        }
       </Flex>
       <Grid templateColumns='repeat(7, 1fr)' gap='8px' marginBottom={'8px'}>
         {
