@@ -1,6 +1,7 @@
 import { Flex } from "@chakra-ui/react";
 import ToDoCategory from "../ToDoCategory";
 import useTodoCategories from "../../../hooks/useTodoCategories";
+import LazyLoad from "react-lazy-load";
 
 export default function TodoCategoryList() {
   const { todoCategories } = useTodoCategories()
@@ -10,7 +11,9 @@ export default function TodoCategoryList() {
       {
         todoCategories.map(item => {
           return (
-            <ToDoCategory key={item.id} todoCategory={item} />
+            <LazyLoad key={item.id}>
+              <ToDoCategory todoCategory={item} />
+            </LazyLoad>
           )
         })
       }

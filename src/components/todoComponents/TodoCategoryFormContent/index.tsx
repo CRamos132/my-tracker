@@ -3,14 +3,14 @@ import { useAuth } from "../../../contexts/AuthContext"
 import { useState } from "react"
 import { TodoCategory } from "../../../hooks/useTodoCategories"
 
-interface ITodoFormContent {
+interface ITodoCategoryFormContent {
   onSubmit: (todoCategory: TodoCategory) => void
   todo?: TodoCategory
 }
 
 const COLORS = ['red', 'blue', 'green', 'yellow', 'gray']
 
-export default function TodoCategoryFormContent({ onSubmit, todo }: ITodoFormContent) {
+export default function TodoCategoryFormContent({ onSubmit, todo }: ITodoCategoryFormContent) {
   const [selectedColor, setSelectedColor] = useState(COLORS[0])
 
   const toast = useToast()

@@ -1,23 +1,22 @@
 import { Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, useToast } from "@chakra-ui/react";
+import TodoCategoryFormContent from "../TodoCategoryFormContent";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDoc, collection } from "firebase/firestore/lite";
 import { db } from "../../../lib/firebase";
-import TodoFormContent, { Todo } from "../TodoFormContents";
 import { TodoCategory } from "../../../hooks/useTodoCategories";
 
-interface INewTodoForm {
+interface INewTodoCategoryForm {
   onClose: () => void
   isOpen: boolean
-  todoCategory: TodoCategory
 }
 
-export default function NewTodoForm({ isOpen, onClose, todoCategory }: INewTodoForm) {
+export default function NewTodoCategoryForm({ isOpen, onClose }: INewTodoCategoryForm) {
   const toast = useToast()
   const queryClient = useQueryClient()
 
-  const createTodo = async (todo: Todo) => {
-    return await addDoc(collection(db, "todos"), {
-      ...todo,
+  const createTodoCategory = async (todoCategody: TodoCategory) => {
+    return await addDoc(collection(db, "todoCategories"), {
+      ...todoCategody,
     })
       .catch((error) => {
         return error
@@ -25,7 +24,7 @@ export default function NewTodoForm({ isOpen, onClose, todoCategory }: INewTodoF
   }
 
   const mutation = useMutation({
-    mutationFn: createTodo,
+    mutationFn: createTodoCategory,
     onSuccess: () => {
       toast({
         title: "Categoria criada com sucesso.",
@@ -33,7 +32,7 @@ export default function NewTodoForm({ isOpen, onClose, todoCategory }: INewTodoF
         duration: 9000,
         isClosable: true,
       });
-      queryClient.invalidateQueries({ queryKey: ['todos'] })
+      queryClient.invalidateQueries({ queryKey: ['todoCategories'] })
       onClose()
     },
     onError: (error) => {
@@ -47,7 +46,7 @@ export default function NewTodoForm({ isOpen, onClose, todoCategory }: INewTodoF
     }
   })
 
-  const handleCreateMood = (todoCategory: Todo) => {
+  const handleCreateMood = (todoCategory: TodoCategory) => {
     mutation.mutate(todoCategory)
   }
 
@@ -57,10 +56,10 @@ export default function NewTodoForm({ isOpen, onClose, todoCategory }: INewTodoF
       <DrawerContent borderRadius={'24px 24px 0px 0px'}>
         <DrawerCloseButton />
         <DrawerHeader>
-          Novo To Do
+          Nova Categoria
         </DrawerHeader>
         <DrawerBody>
-          <TodoFormContent todoCategory={todoCategory} onSubmit={handleCreateMood} />
+          <TodoCategoryFormContent onSubmit={handleCreateMood} />
         </DrawerBody>
       </DrawerContent>
     </Drawer>

@@ -2,14 +2,23 @@ import { Button, Flex, FormControl, FormLabel, Input, useToast } from "@chakra-u
 import { useAuth } from "../../../contexts/AuthContext"
 import { TodoCategory } from "../../../hooks/useTodoCategories"
 
-interface ITodoFormContent {
-  onSubmit: (todo: TodoCategory) => void
-  todo?: TodoCategory
+type Recurrences = 'daily' | 'weekly' | 'monthly' | 'once'
+
+export type Todo = {
+  name: string
+  createdBy?: string
+  recurrence: Recurrences
+  todoCategoryId?: string
+  id?: string
 }
 
-const COLORS = ['red', 'blue', 'green', 'yellow', 'gray']
+interface ITodoFormContent {
+  onSubmit: (todo: Todo) => void
+  todo?: Todo
+  todoCategory: TodoCategory
+}
 
-export default function TodoCategoryFormContent({ onSubmit, todo }: ITodoFormContent) {
+export default function TodoFormContent({ onSubmit, todo, todoCategory }: ITodoFormContent) {
 
   const toast = useToast()
   const { user } = useAuth()
@@ -20,8 +29,9 @@ export default function TodoCategoryFormContent({ onSubmit, todo }: ITodoFormCon
     const data = Object.fromEntries(formData)
     const newTodo = {
       name: data?.name as string,
-      color: '',
-      createdBy: user?.uid
+      recurrence: 'daily' as Recurrences,
+      createdBy: user?.uid,
+      todoCategoryId: todoCategory.id
     }
     if (!newTodo.name || !newTodo.createdBy) {
       toast({
@@ -45,20 +55,11 @@ export default function TodoCategoryFormContent({ onSubmit, todo }: ITodoFormCon
       onSubmit={handleForm}
     >
       <FormControl>
-        <FormLabel>Nome da categoria</FormLabel>
+        <FormLabel>Nome do todo</FormLabel>
         <Input defaultValue={todo?.name} name="name" type='text' backgroundColor={'white'} />
       </FormControl>
       <FormControl>
-        <FormLabel>Cor da categoria</FormLabel>
-        <Flex direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
-          {
-            COLORS.map(item => {
-              return (
-                <Button backgroundColor={`${item}.300`} border={`2px solid var(--chakra-colors-${item}-600)`} key={item} />
-              )
-            })
-          }
-        </Flex>
+        <FormLabel>Recorrência</FormLabel>
       </FormControl>
       <Button type="submit">
         Criar

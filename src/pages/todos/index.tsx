@@ -1,8 +1,8 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import PageWrapper from "../../components/PageWrapper";
-import NewTodoForm from "../../components/todoComponents/NewTodoForm";
+import NewTodoForm from "../../components/todoComponents/NewTodoCategoryForm";
 import { useState } from "react";
-import TodoCategoryList from "../../components/todoComponents/TodoCategoryList";
+import NewTodoCategoryForm from "../../components/todoComponents/TodoCategoryList";
 
 export default function TodoPage() {
   const [isNewTodoFormOpen, setIsNewTodoFormOpen] = useState(false)
@@ -20,7 +20,7 @@ export default function TodoPage() {
         </Box>
         <Button onClick={() => setIsNewTodoFormOpen(true)}>+</Button>
       </Flex>
-      <TodoCategoryList />
+      <NewTodoCategoryForm />
       <NewTodoForm isOpen={isNewTodoFormOpen} onClose={() => setIsNewTodoFormOpen(false)} />
     </PageWrapper>
   )
