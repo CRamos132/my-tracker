@@ -1,16 +1,7 @@
 import { Button, Flex, FormControl, FormLabel, Input, useToast } from "@chakra-ui/react"
 import { useAuth } from "../../../contexts/AuthContext"
 import { TodoCategory } from "../../../hooks/useTodoCategories"
-
-type Recurrences = 'daily' | 'weekly' | 'monthly' | 'once'
-
-export type Todo = {
-  name: string
-  createdBy?: string
-  recurrence: Recurrences
-  todoCategoryId?: string
-  id?: string
-}
+import { Recurrences, Todo } from "../../../hooks/useGetTodoInCategory"
 
 interface ITodoFormContent {
   onSubmit: (todo: Todo) => void

@@ -1,10 +1,13 @@
 import { Checkbox, Flex, Text } from "@chakra-ui/react";
+import { Todo as TodoType } from "../../../hooks/useGetTodoInCategory";
 
 interface ITodo {
   color: string
+  todo: TodoType
 }
 
-export default function Todo({ color }: ITodo) {
+export default function Todo({ color, todo }: ITodo) {
+
   return (
     <Flex
       direction={'row'}
@@ -17,7 +20,7 @@ export default function Todo({ color }: ITodo) {
         size={'md'}
       />
       <Text marginLeft={'4px'}>
-        Minha to do
+        {todo.name}
       </Text>
     </Flex>
   )

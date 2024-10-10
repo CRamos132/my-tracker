@@ -2,8 +2,9 @@ import { Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, Dra
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDoc, collection } from "firebase/firestore/lite";
 import { db } from "../../../lib/firebase";
-import TodoFormContent, { Todo } from "../TodoFormContents";
+import TodoFormContent from "../TodoFormContents";
 import { TodoCategory } from "../../../hooks/useTodoCategories";
+import { Todo } from "../../../hooks/useGetTodoInCategory";
 
 interface INewTodoForm {
   onClose: () => void

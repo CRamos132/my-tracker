@@ -3,6 +3,7 @@ import Todo from "../Todo";
 import { TodoCategory } from "../../../hooks/useTodoCategories";
 import NewTodoForm from "../NewTodoForm";
 import { useState } from "react";
+import useGetTodoInCategory from "../../../hooks/useGetTodoInCategory";
 
 interface IToDoCategory {
   todoCategory: TodoCategory
@@ -10,6 +11,9 @@ interface IToDoCategory {
 
 export default function ToDoCategory({ todoCategory }: IToDoCategory) {
   const [isNewTodoOpen, setIsNewTodoOpen] = useState(false)
+
+  const { todos } = useGetTodoInCategory({ todoCategoryId: todoCategory.id as string })
+
   return (
     <Flex
       border={`1px solid var(--chakra-colors-${todoCategory.color}-600)`}
@@ -27,7 +31,13 @@ export default function ToDoCategory({ todoCategory }: IToDoCategory) {
       </Flex>
       <Flex direction={'column'} padding={'12px'} gap={'8px'}>
         <Flex direction={'column'} gap={'8px'} maxHeight={'450px'}>
-          <Todo color={todoCategory.color} />
+          {
+            todos.map(item => {
+              return (
+                <Todo key={item.id} todo={item} color={todoCategory.color} />
+              )
+            })
+          }
         </Flex>
         <Button onClick={() => setIsNewTodoOpen(true)}>
           +
