@@ -27,7 +27,7 @@ export default function TodoFormContent({ onSubmit, todo, todoCategory }: ITodoF
       recurrence: recurrenceType,
       createdBy: user?.uid,
       todoCategoryId: todoCategory.id,
-      ...(dueDate && { dueDate })
+      // ...(dueDate && { dueDate })
     }
     if (!newTodo.name || !newTodo.createdBy) {
       toast({
