@@ -25,13 +25,15 @@ function CalendarHeader({ weekday }: ICalendarHeader) {
 }
 
 interface ICalendar {
-  filledDates: number[]
-  entityType: Entities
+  filledDates?: number[]
+  entityType?: Entities
   month?: string | null
   setCurrentMonth?: (operation: 'add' | 'subtract') => void
+  clickDate?: (date: string) => void
+  selectedDate?: string
 }
 
-export default function Calendar({ filledDates, entityType, month, setCurrentMonth }: ICalendar) {
+export default function Calendar({ filledDates = [], entityType, month, setCurrentMonth, clickDate, selectedDate }: ICalendar) {
   const currentMonth = month ?? dayjs()
 
   const monthDays = useMemo(() => {
@@ -146,6 +148,27 @@ export default function Calendar({ filledDates, entityType, month, setCurrentMon
           monthDays.map((item, index) => {
             const isDayDone = formattedFilledDates.includes(item?.date)
             const isDateToday = today === item.date
+
+            if (Boolean(clickDate)) {
+              const isDateSelected = selectedDate === item.date
+
+              return (
+                <GridItem
+                  w='100%'
+                  h='50px'
+                  borderRadius={'4px'}
+                  backgroundColor={isDateSelected ? 'green.300' : 'gray.100'}
+                  _hover={{ bg: isDateSelected ? 'green.300' : 'gray.100' }}
+                  textAlign={'center'}
+                  border={`${isDateToday ? '2px' : '1px'} solid ${isDateToday ? 'var(--chakra-colors-blue-500)' : 'var(--chakra-colors-gray-500)'}`}
+                  key={index}
+                  as={Button}
+                  onClick={() => clickDate?.(item.date)}
+                >
+                  {item.label}
+                </GridItem>
+              )
+            }
 
             return (
               <GridItem

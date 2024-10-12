@@ -1,7 +1,9 @@
-import { Button, Flex, FormControl, FormLabel, Input, useToast } from "@chakra-ui/react"
+import { Button, Flex, FormControl, FormLabel, Input, Select, useToast } from "@chakra-ui/react"
 import { useAuth } from "../../../contexts/AuthContext"
 import { TodoCategory } from "../../../hooks/useTodoCategories"
 import { Recurrences, Todo } from "../../../hooks/useGetTodoInCategory"
+import { useState } from "react"
+import LimitDateSelector from "../LimitDateSelector"
 
 interface ITodoFormContent {
   onSubmit: (todo: Todo) => void
@@ -10,6 +12,8 @@ interface ITodoFormContent {
 }
 
 export default function TodoFormContent({ onSubmit, todo, todoCategory }: ITodoFormContent) {
+  const [recurrenceType, setRecurrenceType] = useState<Recurrences>(todo?.recurrence || 'weekly')
+  const [dueDate, setDueDate] = useState<string | null>(null)
 
   const toast = useToast()
   const { user } = useAuth()
@@ -20,9 +24,10 @@ export default function TodoFormContent({ onSubmit, todo, todoCategory }: ITodoF
     const data = Object.fromEntries(formData)
     const newTodo = {
       name: data?.name as string,
-      recurrence: 'daily' as Recurrences,
+      recurrence: recurrenceType,
       createdBy: user?.uid,
-      todoCategoryId: todoCategory.id
+      todoCategoryId: todoCategory.id,
+      ...(dueDate && { dueDate })
     }
     if (!newTodo.name || !newTodo.createdBy) {
       toast({
@@ -35,6 +40,11 @@ export default function TodoFormContent({ onSubmit, todo, todoCategory }: ITodoF
     }
 
     onSubmit(newTodo)
+  }
+
+  const handleSelectChange = (event) => {
+    const value = event.target.value
+    setRecurrenceType(value)
   }
 
   return (
@@ -51,6 +61,20 @@ export default function TodoFormContent({ onSubmit, todo, todoCategory }: ITodoF
       </FormControl>
       <FormControl>
         <FormLabel>Recorrência</FormLabel>
+        <Select placeholder='Select option' onChange={handleSelectChange} value={todo?.recurrence || recurrenceType}>
+          <option value='daily'>Diária</option>
+          <option value='weekly'>Semanal</option>
+          <option value='monthly'>Mensal</option>
+          <option value='once'>Único</option>
+        </Select>
+      </FormControl>
+      <FormControl>
+        <FormLabel>Data limite</FormLabel>
+        <LimitDateSelector
+          selectedRecurrence={recurrenceType}
+          selectedDueDate={dueDate}
+          setSelectedDueDate={setDueDate}
+        />
       </FormControl>
       <Button type="submit">
         Criar

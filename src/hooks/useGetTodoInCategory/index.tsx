@@ -11,6 +11,7 @@ export type Todo = {
   createdBy?: string
   recurrence: Recurrences
   todoCategoryId?: string
+  dueDate?: string
   id?: string
 }
 
