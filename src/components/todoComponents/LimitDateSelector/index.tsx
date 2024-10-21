@@ -1,4 +1,4 @@
-import { Button, Flex } from "@chakra-ui/react"
+import { Button, Flex, Grid, GridItem } from "@chakra-ui/react"
 import { Recurrences } from "../../../hooks/useGetTodoInCategory"
 import { WEEKDAYS } from "../../../consts/weekdays"
 import Calendar from "../../Calendar"
@@ -59,13 +59,43 @@ export default function LimitDateSelector({ selectedRecurrence, selectedDueDate,
     return (
       <Calendar
         clickDate={(date) => {
-          console.log("🚀 ~ date:", date)
           setSelectedDueDate(date)
         }}
         selectedDate={selectedDueDate ?? ''}
         setCurrentMonth={setCurrentMonth}
         month={currentMonthState}
       />
+    )
+  }
+
+  if (selectedRecurrence === 'monthly') {
+    const monthDays = Array.from(Array(31).keys())
+
+    return (
+      <Grid templateColumns='repeat(7, 1fr)' gap='8px'>
+        {
+          monthDays.map(item => {
+            const day = item + 1
+            const isDateSelected = String(day) === selectedDueDate
+            return (
+              <GridItem
+                w='100%'
+                h='50px'
+                borderRadius={'4px'}
+                backgroundColor={isDateSelected ? 'green.300' : 'gray.100'}
+                _hover={{ bg: isDateSelected ? 'green.300' : 'gray.100' }}
+                textAlign={'center'}
+                border={`1px solid var(--chakra-colors-gray-500)`}
+                key={item}
+                as={Button}
+                onClick={() => setSelectedDueDate(String(day))}
+              >
+                {day}
+              </GridItem>
+            )
+          })
+        }
+      </Grid>
     )
   }
 

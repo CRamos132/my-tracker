@@ -2,7 +2,7 @@ import { Button, Flex, FormControl, FormLabel, Input, Select, useToast } from "@
 import { useAuth } from "../../../contexts/AuthContext"
 import { TodoCategory } from "../../../hooks/useTodoCategories"
 import { Recurrences, Todo } from "../../../hooks/useGetTodoInCategory"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import LimitDateSelector from "../LimitDateSelector"
 
 interface ITodoFormContent {
@@ -27,7 +27,7 @@ export default function TodoFormContent({ onSubmit, todo, todoCategory }: ITodoF
       recurrence: recurrenceType,
       createdBy: user?.uid,
       todoCategoryId: todoCategory.id,
-      // ...(dueDate && { dueDate })
+      ...(dueDate && { dueDate })
     }
     if (!newTodo.name || !newTodo.createdBy) {
       toast({
@@ -46,6 +46,10 @@ export default function TodoFormContent({ onSubmit, todo, todoCategory }: ITodoF
     const value = event.target.value
     setRecurrenceType(value)
   }
+
+  useEffect(() => {
+    setDueDate(null)
+  }, [recurrenceType])
 
   return (
     <Flex
@@ -68,14 +72,18 @@ export default function TodoFormContent({ onSubmit, todo, todoCategory }: ITodoF
           <option value='once'>Único</option>
         </Select>
       </FormControl>
-      <FormControl>
-        <FormLabel>Data limite</FormLabel>
-        <LimitDateSelector
-          selectedRecurrence={recurrenceType}
-          selectedDueDate={dueDate}
-          setSelectedDueDate={setDueDate}
-        />
-      </FormControl>
+      {
+        (recurrenceType !== 'daily' && recurrenceType) && (
+          <FormControl>
+            <FormLabel>Data limite</FormLabel>
+            <LimitDateSelector
+              selectedRecurrence={recurrenceType}
+              selectedDueDate={dueDate}
+              setSelectedDueDate={setDueDate}
+            />
+          </FormControl>
+        )
+      }
       <Button type="submit">
         Criar
       </Button>
